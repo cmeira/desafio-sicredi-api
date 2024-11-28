@@ -2,8 +2,9 @@ package com.sicredi.desafioapi.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import com.sicredi.desafioapi.domain.SessaoVotacao;
+
 import com.sicredi.desafioapi.dto.SessaoVotacaoDTO;
+import com.sicredi.desafioapi.model.SessaoVotacao;
 import com.sicredi.desafioapi.service.PautaService;
 import com.sicredi.desafioapi.service.SessaoVotacaoService;
 
@@ -25,8 +26,8 @@ public class SessaoVotacaoController {
     SessaoVotacao sessao = new SessaoVotacao();
     // Buscar a Pauta associada ao ID fornecido no DTO
     sessao.setPauta(pautaService.buscarPorId(dto.getPautaId()));
-    sessao.setDataHoraInicio(dto.getDataHoraInicio());
-    sessao.setDataHoraFim(dto.getDataHoraFim());
+    sessao.setDataAbertura(dto.getDataAbertura());
+    sessao.setDataFechamento(dto.getDataFechamento());
     return toDTO(sessaoVotacaoService.salvar(sessao));
 }
 
@@ -41,8 +42,8 @@ public class SessaoVotacaoController {
     @PutMapping("/{id}")
     public SessaoVotacaoDTO update(@PathVariable Long id, @RequestBody SessaoVotacaoDTO dto) {
         SessaoVotacao sessaoExistente = sessaoVotacaoService.buscarPorId(id);
-        sessaoExistente.setDataHoraInicio(dto.getDataHoraInicio());
-        sessaoExistente.setDataHoraFim(dto.getDataHoraFim());
+        sessaoExistente.setDataAbertura(dto.getDataAbertura());
+        sessaoExistente.setDataFechamento(dto.getDataFechamento());
         return toDTO(sessaoVotacaoService.salvar(sessaoExistente));
     }
 
@@ -55,8 +56,8 @@ public class SessaoVotacaoController {
         SessaoVotacaoDTO dto = new SessaoVotacaoDTO();
         dto.setId(sessao.getId());
         dto.setPautaId(sessao.getPauta().getId());
-        dto.setDataHoraInicio(sessao.getDataHoraInicio());
-        dto.setDataHoraFim(sessao.getDataHoraFim());
+        dto.setDataAbertura(dto.getDataAbertura());
+        dto.setDataFechamento(dto.getDataFechamento());
         return dto;
     }
 }

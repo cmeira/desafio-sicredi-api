@@ -2,8 +2,9 @@ package com.sicredi.desafioapi.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import com.sicredi.desafioapi.domain.Voto;
+
 import com.sicredi.desafioapi.dto.VotoDTO;
+import com.sicredi.desafioapi.model.Voto;
 import com.sicredi.desafioapi.service.AssociadoService;
 import com.sicredi.desafioapi.service.SessaoVotacaoService;
 import com.sicredi.desafioapi.service.VotoService;

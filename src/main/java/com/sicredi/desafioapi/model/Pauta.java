@@ -1,4 +1,4 @@
-package com.sicredi.desafioapi.domain;
+package com.sicredi.desafioapi.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

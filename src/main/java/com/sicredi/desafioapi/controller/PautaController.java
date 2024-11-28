@@ -2,8 +2,9 @@ package com.sicredi.desafioapi.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import com.sicredi.desafioapi.domain.Pauta;
+
 import com.sicredi.desafioapi.dto.PautaDTO;
+import com.sicredi.desafioapi.model.Pauta;
 import com.sicredi.desafioapi.service.PautaService;
 
 import java.util.List;

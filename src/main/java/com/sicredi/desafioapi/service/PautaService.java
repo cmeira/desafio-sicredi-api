@@ -3,7 +3,7 @@ package com.sicredi.desafioapi.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.sicredi.desafioapi.domain.Pauta;
+import com.sicredi.desafioapi.model.Pauta;
 import com.sicredi.desafioapi.repository.PautaRepository;
 
 import java.util.List;

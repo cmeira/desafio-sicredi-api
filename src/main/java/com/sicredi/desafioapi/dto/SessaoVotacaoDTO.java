@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class SessaoVotacaoDTO {
     private Long id;
     private Long pautaId; // Relacionamento com Pauta
-    private LocalDateTime dataHoraInicio;
-    private LocalDateTime dataHoraFim;
+    private LocalDateTime dataAbertura;
+    private LocalDateTime dataFechamento;
 }

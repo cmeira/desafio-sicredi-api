@@ -2,9 +2,15 @@ package com.sicredi.desafioapi.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.sicredi.desafioapi.model.Associado;
+import com.sicredi.desafioapi.model.SessaoVotacao;
+import com.sicredi.desafioapi.model.Voto;
+import com.sicredi.desafioapi.repository.AssociadoRepository;
 import com.sicredi.desafioapi.repository.VotoRepository;
-import com.sicredi.desafioapi.domain.SessaoVotacao;
-import com.sicredi.desafioapi.domain.Voto;
+
+import jakarta.transaction.Transactional;
+
 import java.util.List;
 
 @Service
@@ -12,6 +18,19 @@ public class VotoService {
 
     @Autowired
     private VotoRepository votoRepository;
+    @Autowired
+    private AssociadoRepository associadoRepository;
+    
+
+     // Método para registrar o voto de um associado
+    @Transactional
+    public Voto registrarVoto(SessaoVotacao sessaoVotacao, Associado associado, String voto) {
+        Voto novoVoto = new Voto();
+        novoVoto.setSessaoVotacao(sessaoVotacao);
+        novoVoto.setAssociado(associado);
+        novoVoto.setVoto(voto);
+        return votoRepository.save(novoVoto);
+    }
 
 
     // Salvar ou registrar um Voto

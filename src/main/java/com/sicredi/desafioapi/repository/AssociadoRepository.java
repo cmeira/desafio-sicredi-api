@@ -3,7 +3,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.sicredi.desafioapi.domain.Associado;
+import com.sicredi.desafioapi.model.Associado;
 
 public interface AssociadoRepository extends JpaRepository<Associado, Long> {
     @Query("SELECT a FROM Associado a WHERE a.cpf = :cpf")

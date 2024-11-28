@@ -1,19 +1,91 @@
 package com.sicredi.desafioapi.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.sicredi.desafioapi.repository.SessaoVotacaoRepository;
-import com.sicredi.desafioapi.domain.SessaoVotacao;
-
+import java.sql.Date;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.stereotype.Service;
+
+import com.sicredi.desafioapi.dto.ResultadoVotacaoDTO;
+import com.sicredi.desafioapi.model.Pauta;
+import com.sicredi.desafioapi.model.SessaoVotacao;
+import com.sicredi.desafioapi.repository.PautaRepository;
+import com.sicredi.desafioapi.repository.SessaoVotacaoRepository;
+import com.sicredi.desafioapi.repository.VotoRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class SessaoVotacaoService {
 
     @Autowired
     private SessaoVotacaoRepository sessaoVotacaoRepository;
+    @Autowired
+    private PautaRepository pautaRepository;
+    @Autowired
+    private VotoRepository votoRepository;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1); // Agendador com 1 thread
+
+
+    // Método para abrir sessão de votação
+    public SessaoVotacao abrirSessaoVotacao(Pauta pauta, LocalDateTime dataAbertura, Duration duracao) {
+        SessaoVotacao sessao = new SessaoVotacao();
+        sessao.setPauta(pauta);
+        sessao.setDataAbertura(dataAbertura);
+        sessao.setDataFechamento(dataAbertura.plus(duracao != null ? duracao : Duration.ofMinutes(1)));
+        sessao = sessaoVotacaoRepository.save(sessao);
+
+        // Agendar o fechamento da sessão
+        agendarFechamentoSessaoVotacao(sessao);
+        
+        return sessao;
+    }
+
+    // Agendar o fechamento da sessão de votação
+   // Refatoração: Agendar o fechamento da sessão de votação com ScheduledExecutorService
+    private void agendarFechamentoSessaoVotacao(SessaoVotacao sessao) {
+        LocalDateTime dataFechamento = sessao.getDataFechamento();
+        long delayMillis = Duration.between(LocalDateTime.now(), dataFechamento).toMillis();
+
+        // Agendar o fechamento da sessão de votação
+        if (delayMillis > 0) {
+            scheduler.schedule(() -> {
+                encerrarSessaoVotacao(sessao);
+            }, delayMillis, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    // Encerrar a sessão de votação
+    @Transactional
+    public void encerrarSessaoVotacao(SessaoVotacao sessaoVotacao) { 
+
+        // Marca a sessão como encerrada
+        sessaoVotacao.setFechada(true);
+        sessaoVotacaoRepository.save(sessaoVotacao);
+
+        // Conta os votos
+        long simCount = votoRepository.countBySessaoVotacaoAndVoto(sessaoVotacao, "SIM");
+        long naoCount = votoRepository.countBySessaoVotacaoAndVoto(sessaoVotacao, "NAO");
+
+        // Envia o resultado via RabbitMQ
+        ResultadoVotacaoDTO resultado = new ResultadoVotacaoDTO(simCount, naoCount);
+        rabbitTemplate.convertAndSend("resultadoQueue", resultado);
+    }
+
+    public SessaoVotacao obterSessaoVotacao(Long sessaoVotacaoId) {
+        return sessaoVotacaoRepository.findById(sessaoVotacaoId)
+                .orElseThrow(() -> new RuntimeException("Sessão de votação não encontrada para o ID: " + sessaoVotacaoId));
+    }
 
     // Salvar ou atualizar uma Sessão de Votação
     public SessaoVotacao salvar(SessaoVotacao sessaoVotacao) {

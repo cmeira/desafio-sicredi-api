@@ -2,8 +2,9 @@ package com.sicredi.desafioapi.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.sicredi.desafioapi.model.Associado;
 import com.sicredi.desafioapi.repository.AssociadoRepository;
-import com.sicredi.desafioapi.domain.Associado;
 
 import java.util.List;
 
