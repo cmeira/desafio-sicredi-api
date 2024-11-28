@@ -34,8 +34,6 @@ public class SessaoVotacaoService {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1); // Agendador com 1 thread
-
 
     // Método para abrir sessão de votação
     public SessaoVotacao abrirSessaoVotacao(Pauta pauta, LocalDateTime dataAbertura, Duration duracao) {
