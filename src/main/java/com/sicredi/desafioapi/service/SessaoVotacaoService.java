@@ -51,17 +51,15 @@ public class SessaoVotacaoService {
         return sessao;
     }
 
-    // Agendar o fechamento da sessão de votação
-   // Refatoração: Agendar o fechamento da sessão de votação com ScheduledExecutorService
-    private void agendarFechamentoSessaoVotacao(SessaoVotacao sessao) {
+    public void agendarFechamentoSessaoVotacao(SessaoVotacao sessao) {
         LocalDateTime dataFechamento = sessao.getDataFechamento();
         long delayMillis = Duration.between(LocalDateTime.now(), dataFechamento).toMillis();
-
-        // Agendar o fechamento da sessão de votação
+    
         if (delayMillis > 0) {
-            scheduler.schedule(() -> {
-                encerrarSessaoVotacao(sessao);
-            }, delayMillis, TimeUnit.MILLISECONDS);
+            rabbitTemplate.convertAndSend("sessaoQueue", sessao, message -> {
+                message.getMessageProperties().setExpiration(String.valueOf(delayMillis));
+                return message;
+            });
         }
     }
 
